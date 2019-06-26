@@ -1,0 +1,316 @@
+package com.controllers;
+
+/**
+ * Created by Asad on 1/7/2019.
+ */
+
+import com.Beans.Database;
+import com.Beans.Report;
+import com.Beans.Role;
+import com.Beans.User;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Created by Hp on 11/25/2018.
+ */
+@MultipartConfig
+@Controller
+public class HomeController {
+
+
+private Database db = new Database();
+
+    @RequestMapping(value = "/index")
+    public ModelAndView index(HttpSession session) {
+        //dao.delete(id);
+
+        System.out.println("Session_id: "+session.getId());
+        System.out.println("Session_id: "+session.getAttribute("userdata"));
+        return new ModelAndView("MainPage");
+    }
+    @RequestMapping(value = "/examp")
+    public ModelAndView example() {
+        //dao.delete(id);
+        return new ModelAndView("example");
+    }
+    @RequestMapping(value = "/dashboard")
+    public ModelAndView indexx() {
+        //dao.delete(id);
+        return new ModelAndView("DashBoard");
+    }
+
+    @RequestMapping(value = "/")
+    public ModelAndView mainpagee() {
+        return new ModelAndView("MainPage");
+    }
+    @RequestMapping(value = "/dashboardSigin")
+    public ModelAndView dashboardSigin(Model model) {
+        model.addAttribute("user", new User());
+        return new ModelAndView("/DashBoardSigin");
+    }
+    @RequestMapping(value = "/dashboardSigup")
+    public ModelAndView dashboardSignup() {
+        //dao.delete(id);
+        return new ModelAndView("/DashBoardSigup");
+    }
+    @RequestMapping("/CitizenSignUpNew") //used for citizen signup
+    public ModelAndView showCitizenSignupFormm() {
+        return new ModelAndView("CitizenSignupNewww", "command", new User());
+    }
+    @RequestMapping(value = "/citizensignupNew", method = RequestMethod.POST) //used for citizen signup
+    public ModelAndView signupNew(@RequestParam("dataa") String[] data,@RequestParam("filedata") MultipartFile file ,HttpSession session) {
+        Role role = db.getDatabaseRole("citizen");
+        // AccessRights accessRights=role.getAccessRights();
+        byte[] image =null;
+        MultipartFile img = file;
+        try {
+            image = img.getBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        User user = new User();
+        user.setFull_name(data[0]);
+        user.setUser_name(data[1]);
+        user.setEmail(data[2]);
+        user.setPassword(data[3]);
+        user.setCnic(data[5]);
+        user.setPhone_no(data[6]);
+        user.setCitizenship(data[7]);
+        user.setAddress(data[8]);
+        user.setGender(data[9]);
+        user.setRole(role);
+        User u = db.getUser(user.getUser_name());
+        user.setImagee(image);
+        int uid = u.getUser_id();
+        System.out.println("full name: " + data[0]);
+        System.out.println("user_name: " + data[1]);
+        System.out.println("email: " + data[2]);
+        System.out.println("pass: " + data[3]);
+        System.out.println("cnpassword: " + data[4]);
+        System.out.println("cnic: " + data[5]);
+        System.out.println("mobile: " + data[6]);
+        System.out.println("sitizen: " + data[7]);
+        System.out.println("address: " + data[8]);
+        System.out.println("gender: " + data[9]);
+        //session.setAttribute("username", u.getUser_name());
+        //session.setAttribute("userid", u.getUser_id());
+        //session.setAttribute("usertype","citizen");
+
+
+        User user1 = db.RegisterCitizen(user);
+        if (user1.equals(null)) {
+            //return new ModelAndView("CitizenSigninNeww");
+            return new ModelAndView("CustomeSigin");
+        } else {
+            return new ModelAndView("CitizenSignupNewww");
+        }
+
+    }
+
+    @RequestMapping(value = "/azeemmap") // remove it after mid
+    public ModelAndView azeemmap() {
+        //dao.delete(id);
+        return new ModelAndView("/azeemmap");
+    }
+
+    @RequestMapping("/customeRegistrationform") //used for citizen signup
+    public ModelAndView customeRegistrationform() {
+        List<Role> rolelist = db.getRoles();
+        return new ModelAndView("CustomeRegistration", "rolelist", rolelist);
+    }
+
+    @RequestMapping(value = "/customeSigninPagee")
+    public ModelAndView customeSignin() {
+        return new ModelAndView("/CustomeSigin");   }
+
+    @RequestMapping(value = "/customeRegistration", method = RequestMethod.POST)
+    public ModelAndView customeRegistration(@RequestParam("dataa") String[] data, HttpSession session) {
+        Role role = new Role();
+        role.setRole_id(Integer.parseInt(data[0]));
+        // AccessRights accessRights=role.getAccessRights();
+        User user = new User();
+        user.setFull_name(data[1]);
+        user.setUser_name(data[2]);
+        user.setEmail(data[3]);
+        user.setPassword(data[4]);
+        user.setCnic(data[6]);
+        user.setPhone_no(data[7]);
+        user.setCitizenship(data[8]);
+        user.setAddress(data[9]);
+        user.setGender(data[10]);
+
+        user.setRole(role);
+        User u = db.getUser(user.getUser_name());
+        int uid = u.getUser_id();
+        System.out.println("full name: " + data[0]);
+        System.out.println("user_name: " + data[1]);
+        System.out.println("email: " + data[2]);
+        System.out.println("pass: " + data[3]);
+        System.out.println("cnpassword: " + data[4]);
+        System.out.println("cnic: " + data[5]);
+        System.out.println("mobile: " + data[6]);
+        System.out.println("sitizen: " + data[7]);
+        System.out.println("address: " + data[8]);
+        System.out.println("gender: " + data[9]);
+        //session.setAttribute("username", u.getUser_name());
+        //session.setAttribute("userid", u.getUser_id());
+        //session.setAttribute("usertype","citizen");
+
+
+        User user1 = db.RegisterCitizen(user);
+        ;//= citizenDbHandler.RegisterCitizen(user);
+        if (user.equals(null)) {
+            //return new ModelAndView("CitizenSigninNeww");
+            return new ModelAndView("CitizenSigninNeww");
+            //session.setAttribute("user",request.getParameter("user_name"));
+            //response.sendRedirect("citizenDashboard.jsp");
+        } else {
+            return new ModelAndView("CitizenSigninNeww");
+        }
+
+    }
+
+    @RequestMapping("/AddReportNe")                                                                  ////////////////////////
+    public ModelAndView addReportNe(HttpSession session) {
+
+        User user = (User) session.getAttribute("userdata");
+            System.out.println("Check the session: " + session.getAttribute("userid"));
+            if (db.getRoleById(user.getRole().getRole_id()).getAccessRights().isCan_report()) {
+                System.out.println("Check the session: " + user.getFull_name());
+                System.out.println("Check the session: " + user.getGender());
+                List<User> userList = db.getRegisteredOrganization(2);
+                return new ModelAndView("/AddReportNeww","users",userList);//, "report", report);
+            } else
+            {
+                if(session.getAttribute("usertype").equals("citizen"))
+                {
+                    return new ModelAndView("CitizenDashBoardNew");
+                } else if(session.getAttribute("usertype").equals("organization"))
+                {
+                    return new ModelAndView("OrganizationLandingPage");
+                }else if(session.getAttribute("usertype").equals("custome"))
+                {
+                    return new ModelAndView("CustomeLandingPage");
+                }else if(session.getAttribute("usertype").equals("admin"))
+                {
+                    return new ModelAndView("AdminLandingPageNew");
+                }else {
+                    return new ModelAndView("");
+                }
+            }
+    }
+
+    @RequestMapping("/mapcluster")
+    public ModelAndView mapCluster() {
+        int user_id = 2;
+        List<Report> reportList = db.getReportsNewByUserId(user_id);//=dao.getEmployees();
+        return new ModelAndView("MapCluster", "list", reportList);
+    }
+
+    @RequestMapping(value = "/addReportNew")
+    public ModelAndView addReportNew() {
+        //dao.delete(id);
+        return new ModelAndView("/AddReportNeww");
+    }
+
+    @RequestMapping(value = "/tablecss")
+    public ModelAndView tableview(HttpSession session) {
+        //dao.delete(id);
+        int user_id = (Integer) session.getAttribute("userid");
+        List<Report> reportList = db.getReportsNewByUserId(user_id);//=dao.getEmployees();
+        //return new ModelAndView("AllReport", "list", reportList);
+        return new ModelAndView("/tableview","list",reportList);
+    }
+    @RequestMapping("/viewReportNew/{r_id}") /////////////
+    public ModelAndView viewReportNew(@PathVariable int r_id) {
+        int user_id = 2;
+        Report report = db.getReportNew(r_id);//=dao.getEmployees();
+        return new ModelAndView("ViewReportNew", "report", report);
+    }
+
+    @RequestMapping(value = "/orgLandingPage")
+    public ModelAndView organizationLandingkiloo() {
+        //dao.delete(id);
+        return new ModelAndView("/OrganizationLandingPage");
+    }
+
+    @RequestMapping(value = "/orgSignupPage")
+    public ModelAndView organizationSignupkiloo() {
+        //dao.delete(id);
+        return new ModelAndView("/OrganizationSignUp");
+    }
+
+    @RequestMapping(value = "/orgsignupNew", method = RequestMethod.POST) //used for citizen signup
+    public ModelAndView orgSignupNew(@RequestParam("dataa") String[] data,@RequestParam("filedata") MultipartFile file, HttpSession session) {
+        Role role = db.getDatabaseRole("organization");
+        User user = new User();
+        user.setFull_name(data[0]);
+        user.setUser_name(data[1]);
+        user.setEmail(data[2]);
+        user.setPassword(data[3]);
+        //user.setCnic(data[5]);//org_id
+        //user.setOrg_id(Integer.parseInt(data[5]));//org_id
+        user.setPhone_no(data[5]);
+        user.setAddress(data[6]);
+        byte[] image =null;
+        MultipartFile img = file;
+        try {
+            image = img.getBytes();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        user.setImagee(image);
+        user.setRole(role);
+        User u = db.getUser(user.getUser_name());
+        int uid = u.getUser_id();
+        System.out.println("user_userid: " + u.getUser_id());
+        session.setAttribute("username", u.getUser_name());
+        session.setAttribute("userid", u.getUser_id());
+        session.setAttribute("usertype","citizen");
+        User user1 = db.RegisterOrganization(user);
+        ;//= citizenDbHandler.RegisterCitizen(user);
+        if (user1.equals(null)) {
+            //return new ModelAndView("CitizenSigninNeww");
+            return new ModelAndView("OrganizationSignUp");
+            //session.setAttribute("user",request.getParameter("user_name"));
+            //response.sendRedirect("citizenDashboard.jsp");
+        } else {
+            return new ModelAndView("CustomeSigin");
+        }
+
+    }
+
+    @RequestMapping(value = "/orgSigninPage")
+    public ModelAndView organizationSigninkiloo() {
+        //dao.delete(id);
+        return new ModelAndView("/OrganizationSignin");
+    }
+    @RequestMapping(value = "/citizenSigninPage")
+    public ModelAndView citizenSigninkiloo(HttpSession session) {
+        session.removeAttribute("userdata");
+        session.removeAttribute("usertype");
+
+        return new ModelAndView("/CitizenSigninNeww");
+    }
+
+    @RequestMapping(value = "/adminSigninPage")
+    public ModelAndView adminSigninkilo() {
+        //dao.delete(id);
+        return new ModelAndView("/AdminSignin");
+    }
+
+
+}
+
